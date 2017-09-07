@@ -9,14 +9,20 @@ CSerial::CSerial(){
 CSerial::~CSerial(){
 };
 
-
+void CSerial::logException(Exception^ ex1)
+{
+}
 
 BOOL CSerial::Open_port(System::String ^  commPort)
 {
 	try {
+		if (_serialPort->IsOpen){
+			_serialPort->Close();
+		}
 		Configure_port(commPort);
 		_serialPort->Open();
 	} catch ( Exception^ ex1) {
+		logException(ex1);
 	}
 
 	return true;
@@ -42,8 +48,6 @@ BOOL CSerial::Configure_port(System::String ^  commPort)
 
 
 
-
-
 	//COMMTIMEOUTS touts;
 
  //   if (! GetCommTimeouts(hComm, &touts) )	{
@@ -66,6 +70,11 @@ BOOL CSerial::Configure_port(System::String ^  commPort)
 /*
 BOOL CSerial::Write_port(void)
 {
+	try {
+	} catch ( Exception^ ex1) {
+		logException(ex1);
+	}
+
  iBytesWritten=0;
  if(WriteFile(hComm,&Byte2Write,1,&iBytesWritten,NULL)==0)
  return false;
@@ -74,19 +83,30 @@ BOOL CSerial::Write_port(void)
 
 //***************************************************
 
-//BOOL CSerial::Read_port( void* lpBuffer, DWORD len, DWORD* dwBytesTransferred)
-//{
-////	return ReadFile (hComm, lpBuffer, len, dwBytesTransferred, 0);
-// // return value will not actually be used and does not make much sense anyhow  ????
-//	return 0;
-//}
+BOOL CSerial::Read_port( array<Byte>^ buffer,   int count)
+{
+	try {
+		_serialPort->Read(buffer,0,count);
+	} catch ( Exception^ ex1) {
+		logException(ex1);
+	}
+//	return ReadFile (hComm, lpBuffer, len, dwBytesTransferred, 0);
+ // return value will not actually be used and does not make much sense anyhow  ????
+	return true;
+}
 
 //**************************************************
 
-//BOOL CSerial::Close_port(void)
-//{
-//// CloseHandle(hComm);
-// return true;
-//}
+BOOL CSerial::Close_port(void)
+{
+	try {
+		if (_serialPort->IsOpen){
+			_serialPort->Close();
+		}
+	} catch ( Exception^ ex1) {
+		logException(ex1);
+	}
+ return true;
+}
 //*************************************************
 // main function 

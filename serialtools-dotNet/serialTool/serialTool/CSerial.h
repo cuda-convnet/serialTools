@@ -30,8 +30,8 @@ static SerialPort^ _serialPort;
 
  BOOL Open_port(System::String ^  commPort);
 // BOOL Write_port(void);
- //BOOL Read_port( void* lpBuffer, DWORD len,DWORD* dwBytesTransferred);
-// BOOL Close_port(void);
+ BOOL Read_port( array<Byte>^  , int );
+ BOOL Close_port(void);
 
 private:
 
@@ -46,4 +46,5 @@ private:
  DWORD dwBytesRead;
 
  BOOL Configure_port(System::String ^  commPort);
+ void logException(Exception^ ex1);
 } ;

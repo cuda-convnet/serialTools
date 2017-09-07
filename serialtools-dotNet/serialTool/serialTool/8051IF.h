@@ -1,10 +1,10 @@
 #include "stdafx.h"
-#include <commctrl.h>
+//#include <commctrl.h>
 //#include "CSerial.h"
 
 
 
-typedef int BOOL;
+typedef bool BOOL;
 typedef int HANDLE;
 typedef int DWORD;
 
@@ -44,5 +44,5 @@ private:
 	static DWORD measureCount;
 //	CSerial commPort;
 	
-	static long WINAPI C8051IF::hygroThreadMethod(void* pParam); 
+//	static long WINAPI C8051IF::hygroThreadMethod(void* pParam); 
 };

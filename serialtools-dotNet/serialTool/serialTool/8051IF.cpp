@@ -26,12 +26,12 @@ DWORD C8051IF::measureCount;
 C8051IF::Mutex::Mutex(HANDLE* lpMutex)
 {
 	mutex = * lpMutex;
-	WaitForSingleObject(mutex,INFINITE);
+//	WaitForSingleObject(mutex,INFINITE);
 }
 
 C8051IF::Mutex::~Mutex()
 {
-	SetEvent(mutex);
+//	SetEvent(mutex);
 }
 	
 
@@ -39,10 +39,10 @@ C8051IF::Mutex::~Mutex()
 
 C8051IF::C8051IF() 
 {
-	hygroStopEvent = CreateEvent(NULL,TRUE,FALSE,NULL);
-	hygroMutex = CreateEvent(NULL,FALSE,TRUE,NULL);
+	//hygroStopEvent = CreateEvent(NULL,TRUE,FALSE,NULL);
+	//hygroMutex = CreateEvent(NULL,FALSE,TRUE,NULL);
 	
-	TRACE0("\nconstuctor C8051IF  %i\n");
+//	TRACE0("\nconstuctor C8051IF  %i\n");
 	
 /*	if (! start())  {
 		MessageBox(NULL,"error on HygroIF start","error", MB_OK);
@@ -53,13 +53,13 @@ C8051IF::C8051IF()
 
 C8051IF::~C8051IF()
 {
-	TRACE0("\ndestructor C8051IF\n");
+//	TRACE0("\ndestructor C8051IF\n");
 }
 
 
 int C8051IF::start()
 {
-	TRACE0("\nstart C8051IF\n");
+//	TRACE0("\nstart C8051IF\n");
 //	commPort.Open_port();
 
 //	hygroThread = CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)hygroThreadMethod,this,0,NULL);
@@ -70,18 +70,18 @@ int C8051IF::start()
 void C8051IF::stop()
 {
 	DWORD tmOut;
-	TRACE0("\nstop C8051IF\n");
-//	commPort.Close_port();
-	SetEvent(hygroStopEvent);
-	tmOut = GBSerialReadTotalTimeoutConstant  \
-			+ GBReadIntervalTimeout  \
-			+ 2000;  //  max calculation time
-
-	WaitForSingleObject(hygroThread,tmOut);
+//	TRACE0("\nstop C8051IF\n");
+////	commPort.Close_port();
+//	SetEvent(hygroStopEvent);
+//	tmOut = GBSerialReadTotalTimeoutConstant  \
+//			+ GBReadIntervalTimeout  \
+//			+ 2000;  //  max calculation time
+//
+//	WaitForSingleObject(hygroThread,tmOut);
 }
 
 
-
+/*
 long WINAPI C8051IF::hygroThreadMethod(void* pParam)
 {
 	int step = 0;
@@ -101,21 +101,21 @@ long WINAPI C8051IF::hygroThreadMethod(void* pParam)
 	TRACE0("\nHYGROTHREAD::hygro Thrad Returning\n");
 	return 0;
 }
-
+*/
 
 void C8051IF::incMeasure(double hum, double temp)
 {
-	Mutex m (&hygroMutex);
+//	Mutex m (&hygroMutex);
 
 	measureCount ++;
 	temperature = temp;
 	humidity = hum;
-	deviceRunning = TRUE;
+	deviceRunning = true;
 }
 
 void C8051IF::getMeasure(double& hum, double& temp, DWORD& cnt)
 {
-	Mutex m (&hygroMutex);
+//	Mutex m (&hygroMutex);
 
 	cnt = measureCount;
 	temp = temperature;
@@ -128,7 +128,7 @@ BOOL C8051IF::getSensorValues()
 	char buffer [300];
 	DWORD amtRcv;
 
-	memset(&buffer, 0, sizeof(buffer));
+//	memset(&buffer, 0, sizeof(buffer));
 
 //	commPort.Read_port(&buffer, sizeof(buffer), &amtRcv);
 
@@ -152,7 +152,7 @@ BOOL C8051IF::getSensorValues()
 //		double hyd = strtoul (hydS, &hydS + 4, 0x10);
 //		hyd = hyd / 200;
 
-		TRACE3("\n%i received: %i  %s\n",measureCount,amtRcv, buffer);
+//		TRACE3("\n%i received: %i  %s\n",measureCount,amtRcv, buffer);
 		incMeasure(0.0,0.0);
 
 //		TRACE2("\nV01: %s %f\n",tempS, temp);
@@ -181,21 +181,21 @@ BOOL C8051IF::getSensorValues()
 	}  else
 	{
 //		setDeviceRunning(FALSE);
-		TRACE2("%i nothing received: %i\n",measureCount, amtRcv);
+//		TRACE2("%i nothing received: %i\n",measureCount, amtRcv);
 		incMeasure(0.0,0.0);
 	}
 	
-	return  TRUE;
+	return  true;
 }
 
 BOOL C8051IF::isDeviceRunning()
 {
-	Mutex m (&hygroMutex);
+//	Mutex m (&hygroMutex);
 	return deviceRunning;
 }
 
 void C8051IF::setDeviceRunning(BOOL runOK)
 {
-	Mutex m (&hygroMutex);
+//	Mutex m (&hygroMutex);
 	deviceRunning = runOK;
 }

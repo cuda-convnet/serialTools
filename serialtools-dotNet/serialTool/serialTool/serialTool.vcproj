@@ -22,6 +22,7 @@
 			ConfigurationType="1"
 			CharacterSet="1"
 			ManagedExtensions="2"
+			DeleteExtensionsOnClean="*.obj;*.ilk;*.tlb;*.tli;*.ncb;*.tlh;*.tmp;*.rsp;*.pgc;*.pgd;$(TargetPath)"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -196,6 +197,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\8051IF.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\AssemblyInfo.cpp"
 				>
 			</File>
@@ -233,6 +238,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\8051IF.h"
+				>
+			</File>
 			<File
 				RelativePath=".\CSerial.h"
 				>
