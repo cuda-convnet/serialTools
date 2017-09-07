@@ -1,16 +1,19 @@
 #include "stdafx.h"
 //#include <commctrl.h>
-//#include "CSerial.h"
+#include "CSerial.h"
+
+using namespace System;
+using namespace System::Threading;
+using namespace System::Diagnostics;
 
 
-
-typedef bool BOOL;
+//typedef bool BOOL;
 typedef int HANDLE;
-typedef int DWORD;
+//typedef int DWORD;
 
 #define WINAPI
 
-class C8051IF {
+public ref class C8051IF {
 public:
 
 	BOOL isDeviceRunning();
@@ -20,20 +23,22 @@ public:
 	int start();
 	void stop();
 	void getMeasure(double& hum, double& temp, DWORD& cnt);
+	static int initClass();
+	static CSerial^ commPort;
+	
 
 private:
 	BOOL deviceRunning;
 	void setDeviceRunning(BOOL runOK);
 
-	class Mutex{
-	public:
+	ref class Mutex{
 		Mutex(HANDLE* lpMutex);
 		~Mutex();
 		HANDLE mutex;
 	};
 	
 
-	HANDLE hygroThread;  // Thread reading values from Sensor
+	Thread^ hygroThread;  // Thread reading values from Sensor
 	void incMeasure(double hum, double temp);
 	BOOL getSensorValues();
 	static HANDLE hygroStopEvent;  // event to communicate to the hygrothread
@@ -42,7 +47,7 @@ private:
 	static double temperature;
 	static double humidity;
 	static DWORD measureCount;
-//	CSerial commPort;
+	void logException(Exception^ ex1);
 	
-//	static long WINAPI C8051IF::hygroThreadMethod(void* pParam); 
+	static void hygroThreadMethod(); 
 };

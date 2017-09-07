@@ -5,9 +5,7 @@
 using namespace System;
 using namespace System::IO::Ports;
 using namespace System::Threading;
-
-
-
+using namespace System::Diagnostics;
 
 //  PN 8. Nov 2005
 //
@@ -16,7 +14,7 @@ using namespace System::Threading;
 //
 
 
-typedef int   BOOL;
+typedef bool   BOOL;
 typedef long	DWORD;
 
 

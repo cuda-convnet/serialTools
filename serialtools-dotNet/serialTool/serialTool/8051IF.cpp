@@ -3,12 +3,12 @@
 
 
 
-HANDLE C8051IF::hygroStopEvent;
-HANDLE C8051IF::hygroMutex;
+//HANDLE C8051IF::hygroStopEvent;
+//HANDLE C8051IF::hygroMutex;
 
-double C8051IF::temperature;
-double C8051IF::humidity;
-DWORD C8051IF::measureCount;
+//double C8051IF::temperature;
+//double C8051IF::humidity;
+//DWORD C8051IF::measureCount;
 
 
 
@@ -59,9 +59,10 @@ C8051IF::~C8051IF()
 
 int C8051IF::start()
 {
-//	TRACE0("\nstart C8051IF\n");
-//	commPort.Open_port();
+	Debug::WriteLine("\nstart C8051IF\n");
+	commPort->Open_port("com1");  // tobe taken later from Form1 field
 
+	hygroThread = gcnew Thread(gcnew ThreadStart(C8051IF::hygroThreadMethod));
 //	hygroThread = CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)hygroThreadMethod,this,0,NULL);
 
 	return 1;
@@ -81,27 +82,27 @@ void C8051IF::stop()
 }
 
 
-/*
-long WINAPI C8051IF::hygroThreadMethod(void* pParam)
+
+//static void C8051IF::hygroThreadMethod()
+void C8051IF::hygroThreadMethod()
 {
 	int step = 0;
 
 	
-	C8051IF* HSIF = (C8051IF*) pParam;
-	TRACE0("\nHYGROTHREAD::hygro Thread Started\n");
+	Debug::WriteLine("\nHYGROTHREAD::hygro Thread Started\n");
 
-	while (WaitForSingleObject(hygroStopEvent,100) != WAIT_OBJECT_0) {
+//	while (WaitForSingleObject(hygroStopEvent,100) != WAIT_OBJECT_0) {
 		++ step;
-//		TRACE1("HYGROTHREAD::hygro Thrad step %i\n",step);
+		Debug::WriteLine(String::Format("HYGROTHREAD::hygro Thrad step %i\n",step));
 
-		if (! HSIF->getSensorValues()) {
-			TRACE0("\nHYGROTHREAD::hygro Thread error getting values");
-		}
-	}
-	TRACE0("\nHYGROTHREAD::hygro Thrad Returning\n");
-	return 0;
+		//if (! C8051IF::commPort getSensorValues()) {
+		//	TRACE0("\nHYGROTHREAD::hygro Thread error getting values");
+		//}
+//	}
+		Debug::WriteLine("\nHYGROTHREAD::hygro Thrad Returning\n");
+
 }
-*/
+
 
 void C8051IF::incMeasure(double hum, double temp)
 {
@@ -198,4 +199,15 @@ void C8051IF::setDeviceRunning(BOOL runOK)
 {
 //	Mutex m (&hygroMutex);
 	deviceRunning = runOK;
+}
+
+void C8051IF::logException(Exception^ ex1)
+{
+	Debug::WriteLine(String::Format("C8051IF exception %s\source: %s\nmessage : %s\nstack: %s",ex1->ToString(),ex1->Source,ex1->Message,ex1->StackTrace));
+}
+
+ int C8051IF::initClass()
+{
+	C8051IF::commPort = gcnew CSerial();
+	return 0;
 }

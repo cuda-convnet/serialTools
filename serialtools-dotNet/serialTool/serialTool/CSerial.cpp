@@ -11,6 +11,7 @@ CSerial::~CSerial(){
 
 void CSerial::logException(Exception^ ex1)
 {
+	Debug::WriteLine(String::Format("CSerial exception %s\source: %s\nmessage : %s\nstack: %s",ex1->ToString(),ex1->Source,ex1->Message,ex1->StackTrace));
 }
 
 BOOL CSerial::Open_port(System::String ^  commPort)
