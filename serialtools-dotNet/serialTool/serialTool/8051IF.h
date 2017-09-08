@@ -21,9 +21,9 @@ public:
 
 	C8051IF();
 	virtual ~C8051IF();
-	int start();
+	int start(String^);
 	void stop();
-	void getMeasure(double& hum, double& temp, DWORD& cnt);
+	void getMeasure(int& );
 	BOOL getSensorValues();
 	static int initClass();
 
@@ -31,19 +31,19 @@ public:
 private:
 	static CSerial^ commPort;
 	BOOL deviceRunning;
+	BOOL threadRunning;
 	void setDeviceRunning(BOOL runOK);	
 
 	static Thread^ hygroThread;  // Thread reading values from Sensor
-	void incMeasure(double hum, double temp);
+	void incMeasure(int);
 	static Semaphore^ hygroStopEvent;  // event to communicate to the hygrothread
 									// that it shall stop
 	Semaphore^  hygroMutex;		// thread concurrency synchronisation
-	double temperature;
-	double humidity;
+	int torqueADCval;
 	DWORD measureCount;
 	static void logException(Exception^ ex1);
 	
 	static void hygroThreadMethod(); 
 	static C8051IF^ singleton8051IF;
-	static String^ commPortName;
+	static String^ comPortName;
 };
