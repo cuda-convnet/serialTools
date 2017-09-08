@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "8051IF.h"
 
 namespace serialTool {
 
@@ -26,6 +26,10 @@ namespace serialTool {
 		int upperADCgiven;
 		int upperADC;
 		int lowerADCgiven;
+		int lowerADC;
+
+	private: C8051IF  dataIF;
+
 	private: System::Windows::Forms::Button^  button2;
 
 	private: System::Windows::Forms::Label^  label1;
@@ -42,15 +46,13 @@ namespace serialTool {
 	private: System::Windows::Forms::Button^  connectButton;
 
 	public: 
-		int lowerADC;
 
-	
 
 		Form1(void)
 		{
 			InitializeComponent();
 			//
-			//TODO: Add the constructor code here
+			//  Add the constructor code here
 			//
 			upperADCgiven = 0;
 			upperADC = 0;

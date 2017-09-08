@@ -1,16 +1,8 @@
 #include "stdafx.h"
 #include "8051IF.h"
-
-
-
-//HANDLE C8051IF::hygroStopEvent;
-//HANDLE C8051IF::hygroMutex;
-
-//double C8051IF::temperature;
-//double C8051IF::humidity;
-//DWORD C8051IF::measureCount;
-
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 //  PN 8. Nov 2005
 //
@@ -23,33 +15,18 @@
 //  not explicitely be used.
 //
 
-C8051IF::Mutex::Mutex(HANDLE* lpMutex)
-{
-	mutex = * lpMutex;
-//	WaitForSingleObject(mutex,INFINITE);
-}
 
-C8051IF::Mutex::~Mutex()
-{
-//	SetEvent(mutex);
-}
 	
-
-
-
 C8051IF::C8051IF() 
 {
-	//hygroStopEvent = CreateEvent(NULL,TRUE,FALSE,NULL);
-	//hygroMutex = CreateEvent(NULL,FALSE,TRUE,NULL);
-	
-//	TRACE0("\nconstuctor C8051IF  %i\n");
-	
-/*	if (! start())  {
-		MessageBox(NULL,"error on HygroIF start","error", MB_OK);
+	try {
+		hygroStopEvent =   gcnew Semaphore( 0,1 );
+		hygroMutex =   gcnew Semaphore( 1,1 );
 	}
-	*/
+	catch (Exception^ ex)  {
+			logException(ex);
+	}
 }
-
 
 C8051IF::~C8051IF()
 {
@@ -59,11 +36,17 @@ C8051IF::~C8051IF()
 
 int C8051IF::start()
 {
-	Debug::WriteLine("\nstart C8051IF\n");
-	commPort->Open_port("com1");  // tobe taken later from Form1 field
 
-	hygroThread = gcnew Thread(gcnew ThreadStart(C8051IF::hygroThreadMethod));
-//	hygroThread = CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)hygroThreadMethod,this,0,NULL);
+	try {
+		Debug::WriteLine("\nstart C8051IF\n");
+		commPort->Open_port("com1");  // TODO take later from a Form1 field
+
+		hygroThread = gcnew Thread(gcnew ThreadStart(C8051IF::hygroThreadMethod));
+		hygroThread->Start();
+	}
+	catch (Exception^ ex)  {
+			logException(ex);
+	}
 
 	return 1;
 }
@@ -71,13 +54,17 @@ int C8051IF::start()
 void C8051IF::stop()
 {
 	DWORD tmOut;
-//	TRACE0("\nstop C8051IF\n");
-////	commPort.Close_port();
+
+	commPort->Close_port();
+
+	hygroStopEvent->Release();
 //	SetEvent(hygroStopEvent);
-//	tmOut = GBSerialReadTotalTimeoutConstant  \
-//			+ GBReadIntervalTimeout  \
-//			+ 2000;  //  max calculation time
-//
+
+	tmOut = GBSerialReadTotalTimeoutConstant  \
+			+ GBReadIntervalTimeout  \
+			+ 2000;  //  max calculation time
+
+	hygroThread->Join(tmOut);
 //	WaitForSingleObject(hygroThread,tmOut);
 }
 
@@ -89,125 +76,110 @@ void C8051IF::hygroThreadMethod()
 	int step = 0;
 
 	
-	Debug::WriteLine("\nHYGROTHREAD::hygro Thread Started\n");
+	Debug::WriteLine("HYGROTHREAD::hygro Thread Started");
 
+	while (! hygroStopEvent->WaitOne(100) )  {
 //	while (WaitForSingleObject(hygroStopEvent,100) != WAIT_OBJECT_0) {
 		++ step;
-		Debug::WriteLine(String::Format("HYGROTHREAD::hygro Thrad step %i\n",step));
+		Debug::WriteLine(String::Format("HYGROTHREAD::hygro Thrad step %i",step));
 
-		//if (! C8051IF::commPort getSensorValues()) {
-		//	TRACE0("\nHYGROTHREAD::hygro Thread error getting values");
-		//}
-//	}
-		Debug::WriteLine("\nHYGROTHREAD::hygro Thrad Returning\n");
-
+		if (! C8051IF::singleton8051IF->getSensorValues()) {
+			Debug::WriteLine("HYGROTHREAD::hygro Thread error getting values");
+		}
+	}
+	Debug::WriteLine("HYGROTHREAD::hygro Thrad Returning");
 }
 
 
 void C8051IF::incMeasure(double hum, double temp)
 {
-//	Mutex m (&hygroMutex);
+	hygroMutex->WaitOne();
 
 	measureCount ++;
 	temperature = temp;
 	humidity = hum;
 	deviceRunning = true;
+
+	hygroMutex->Release();
 }
 
 void C8051IF::getMeasure(double& hum, double& temp, DWORD& cnt)
 {
-//	Mutex m (&hygroMutex);
+	hygroMutex->WaitOne();
 
 	cnt = measureCount;
 	temp = temperature;
 	hum = humidity;
+
+	hygroMutex->Release();
 }
 
 
+#define bufferSz 300
+
 BOOL C8051IF::getSensorValues()
 {
-	char buffer [300];
-	DWORD amtRcv;
+	char buffer [bufferSz];
+	int amtRcv;
+	BOOL res = false;
 
-//	memset(&buffer, 0, sizeof(buffer));
+	memset(&buffer, 0, sizeof(buffer));
 
-//	commPort.Read_port(&buffer, sizeof(buffer), &amtRcv);
-
-	if (amtRcv > 0) {
-
-/*		char* tempS;
-		char* endS;
-		double rots = 0.0;
-		double rpm;
-
-		tempS = strstr(buffer,"*")+1;
-		endS = strstr(tempS,"*");
+	array<Byte>^ bufferx;
+	bufferx = gcnew array<Byte>(bufferSz);
 
 
-		if ((tempS != NULL) && (endS != NULL)) {
-			TRACE1("temps found %s\n",tempS);
-			rots = strtoul(tempS ,NULL,10) ;
+	commPort->Read_port(bufferx,bufferSz,&amtRcv);
+
+	if (amtRcv == applicationMsgSize ) {
+
+		for (int i1 = 0; i1 < amtRcv; ++ i1) {
+			buffer[i1] = bufferx[i1];
 		}
-		*/
-//		temp = temp / 100;
-//		double hyd = strtoul (hydS, &hydS + 4, 0x10);
-//		hyd = hyd / 200;
 
-//		TRACE3("\n%i received: %i  %s\n",measureCount,amtRcv, buffer);
-		incMeasure(0.0,0.0);
+		char* torqueS;
 
-//		TRACE2("\nV01: %s %f\n",tempS, temp);
-//		TRACE2("\nV02: %s %f\n",hydS, hyd);
+
+		torqueS = strstr(buffer,"01V")+4;
 	
-	//	incMeasure(hyd,temp);
+		*(torqueS+5) = 0;
 
+		long torqueI = strtoul(torqueS ,NULL,0x0A);
+		res = true;
 
-		// timer on 8053 takes 1984 ms
-
-/*		incMeasure(0.0,0.0);
-
-
-		rpm = (rots * 30.0) / 1.991;
-
-
-	    TRACE3("at %i [ms] C8051IF received i bytes: s rots: %f rpm: %f\n",GetTickCount(), rots, rpm);
-
-		AfxGetMainWnd()->PostMessage(WM_CLOSE, 0, 0);
-
-
-
-
- */
-
-	}  else
-	{
-//		setDeviceRunning(FALSE);
-//		TRACE2("%i nothing received: %i\n",measureCount, amtRcv);
-		incMeasure(0.0,0.0);
+	} else {
+		Debug::WriteLine(String::Format("getSensorValues invalid amt chars: %i",amtRcv));
 	}
-	
-	return  true;
+
+	return  res;
 }
 
 BOOL C8051IF::isDeviceRunning()
 {
-//	Mutex m (&hygroMutex);
+	hygroMutex->WaitOne();
+
 	return deviceRunning;
+
+	hygroMutex->Release();
 }
 
 void C8051IF::setDeviceRunning(BOOL runOK)
 {
-//	Mutex m (&hygroMutex);
+	hygroMutex->WaitOne();
+
 	deviceRunning = runOK;
+
+	hygroMutex->Release();
 }
 
 void C8051IF::logException(Exception^ ex1)
 {
-	Debug::WriteLine(String::Format("C8051IF exception %s\source: %s\nmessage : %s\nstack: %s",ex1->ToString(),ex1->Source,ex1->Message,ex1->StackTrace));
+	Debug::WriteLine(String::Format("C8051IF exception %s source: %s\nmessage : %s\nstack: %s",ex1->ToString(),ex1->Source,ex1->Message,ex1->StackTrace));
 }
 
  int C8051IF::initClass()
 {
 	C8051IF::commPort = gcnew CSerial();
+	C8051IF::singleton8051IF = gcnew C8051IF();
 	return 0;
 }

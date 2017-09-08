@@ -44,8 +44,8 @@ BOOL CSerial::Configure_port(System::String ^  commPort)
 	_serialPort->Handshake =  Handshake::None;
 
 	// Set the read/write timeouts
-	_serialPort->ReadTimeout = 500;
-	_serialPort->WriteTimeout = 500;
+	_serialPort->ReadTimeout = GBSerialReadTotalTimeoutConstant;
+	_serialPort->WriteTimeout = GBSerialReadTotalTimeoutConstant;
 
 
 
@@ -84,16 +84,18 @@ BOOL CSerial::Write_port(void)
 
 //***************************************************
 
-BOOL CSerial::Read_port( array<Byte>^ buffer,   int count)
+BOOL CSerial::Read_port( array<Byte>^ buffer,   int count, int* amt)
 {
+	BOOL res = 0;
 	try {
-		_serialPort->Read(buffer,0,count);
+		*amt = _serialPort->Read(buffer,0,count);
+		res = 1;
 	} catch ( Exception^ ex1) {
 		logException(ex1);
 	}
 //	return ReadFile (hComm, lpBuffer, len, dwBytesTransferred, 0);
  // return value will not actually be used and does not make much sense anyhow  ????
-	return true;
+	return res;
 }
 
 //**************************************************

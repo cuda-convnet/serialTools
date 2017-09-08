@@ -17,6 +17,15 @@ using namespace System::Diagnostics;
 typedef bool   BOOL;
 typedef long	DWORD;
 
+#define GBSerialReadTotalTimeoutConstant  8000  
+// must be bigger maximum possible delay between incoming messages
+
+ 
+#define GBReadIntervalTimeout  500
+
+// TODO sad but true. the hyper schicki micki .net does not support that feature, but even worse
+// you can read under serialport.ReceivedBytesThreshold ... they rebuild into some nice featured mask called .net
+// but do not know whatfor serial port really are used..
 
 public ref class CSerial
 {
@@ -28,7 +37,7 @@ static SerialPort^ _serialPort;
 
  BOOL Open_port(System::String ^  commPort);
 // BOOL Write_port(void);
- BOOL Read_port( array<Byte>^  , int );
+ BOOL Read_port( array<Byte>^  , int, int* );
  BOOL Close_port(void);
 
 private:
