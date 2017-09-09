@@ -47,6 +47,9 @@ namespace serialTool {
 	private: System::Windows::Forms::Timer^  timer1;
 	private: System::Windows::Forms::Label^  label6;
 	private: System::Windows::Forms::TextBox^  textBoxNcm;
+	private: System::Windows::Forms::Button^  buttonClearRefs;
+	private: System::Windows::Forms::Button^  buttonDisconnect;
+
 	private: System::Windows::Forms::Button^  connectButton;
 
 	public: 
@@ -110,6 +113,8 @@ namespace serialTool {
 		this->timer1 = (gcnew System::Windows::Forms::Timer(this->components));
 		this->label6 = (gcnew System::Windows::Forms::Label());
 		this->textBoxNcm = (gcnew System::Windows::Forms::TextBox());
+		this->buttonClearRefs = (gcnew System::Windows::Forms::Button());
+		this->buttonDisconnect = (gcnew System::Windows::Forms::Button());
 		this->SuspendLayout();
 		// 
 		// button1
@@ -173,12 +178,12 @@ namespace serialTool {
 		// 
 		// currentADCText
 		// 
-		this->currentADCText->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 50, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point, 
+		this->currentADCText->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 40, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point, 
 			static_cast<System::Byte>(0)));
 		this->currentADCText->Location = System::Drawing::Point(94, 47);
 		this->currentADCText->Name = L"currentADCText";
 		this->currentADCText->ReadOnly = true;
-		this->currentADCText->Size = System::Drawing::Size(132, 83);
+		this->currentADCText->Size = System::Drawing::Size(132, 68);
 		this->currentADCText->TabIndex = 8;
 		this->currentADCText->Text = L"123";
 		// 
@@ -197,17 +202,18 @@ namespace serialTool {
 		this->label4->AutoSize = true;
 		this->label4->Location = System::Drawing::Point(21, 323);
 		this->label4->Name = L"label4";
-		this->label4->Size = System::Drawing::Size(30, 13);
+		this->label4->Size = System::Drawing::Size(33, 13);
 		this->label4->TabIndex = 10;
-		this->label4->Text = L"state";
+		this->label4->Text = L"state:";
 		this->label4->Click += gcnew System::EventHandler(this, &Form1::label4_Click);
 		// 
 		// stateText
 		// 
-		this->stateText->Location = System::Drawing::Point(78, 321);
+		this->stateText->BorderStyle = System::Windows::Forms::BorderStyle::None;
+		this->stateText->Location = System::Drawing::Point(67, 323);
 		this->stateText->Name = L"stateText";
 		this->stateText->ReadOnly = true;
-		this->stateText->Size = System::Drawing::Size(297, 20);
+		this->stateText->Size = System::Drawing::Size(297, 13);
 		this->stateText->TabIndex = 11;
 		this->stateText->Text = L"not ready";
 		// 
@@ -264,11 +270,34 @@ namespace serialTool {
 		this->textBoxNcm->Text = L"000";
 		this->textBoxNcm->TextAlign = System::Windows::Forms::HorizontalAlignment::Right;
 		// 
+		// buttonClearRefs
+		// 
+		this->buttonClearRefs->Location = System::Drawing::Point(451, 310);
+		this->buttonClearRefs->Name = L"buttonClearRefs";
+		this->buttonClearRefs->Size = System::Drawing::Size(114, 23);
+		this->buttonClearRefs->TabIndex = 17;
+		this->buttonClearRefs->Text = L"cleaar ref values";
+		this->buttonClearRefs->UseVisualStyleBackColor = true;
+		this->buttonClearRefs->Click += gcnew System::EventHandler(this, &Form1::buttonClearRefs_Click);
+		// 
+		// buttonDisconnect
+		// 
+		this->buttonDisconnect->Enabled = false;
+		this->buttonDisconnect->Location = System::Drawing::Point(207, 254);
+		this->buttonDisconnect->Name = L"buttonDisconnect";
+		this->buttonDisconnect->Size = System::Drawing::Size(75, 23);
+		this->buttonDisconnect->TabIndex = 18;
+		this->buttonDisconnect->Text = L"disconnect";
+		this->buttonDisconnect->UseVisualStyleBackColor = true;
+		this->buttonDisconnect->Click += gcnew System::EventHandler(this, &Form1::buttonDisconnect_Click);
+		// 
 		// Form1
 		// 
 		this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 		this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 		this->ClientSize = System::Drawing::Size(570, 345);
+		this->Controls->Add(this->buttonDisconnect);
+		this->Controls->Add(this->buttonClearRefs);
 		this->Controls->Add(this->textBoxNcm);
 		this->Controls->Add(this->label6);
 		this->Controls->Add(this->connectButton);
@@ -285,7 +314,7 @@ namespace serialTool {
 		this->Controls->Add(this->button2);
 		this->Controls->Add(this->button1);
 		this->Name = L"Form1";
-		this->Text = L"Form1";
+		this->Text = L"PinionBearingPreloadTorqueMeter";
 		this->ResumeLayout(false);
 		this->PerformLayout();
 
@@ -322,9 +351,6 @@ namespace serialTool {
 
 		private: System::Void label4_Click(System::Object^  sender, System::EventArgs^  e) {
 				 }
-		private: System::Void connectButton_Click(System::Object^  sender, System::EventArgs^  e) {
-				 }
-
 
 		private: System::Void timer1_Tick(System::Object^  sender, System::EventArgs^  e) {
 					 int adcVal;
@@ -334,10 +360,48 @@ namespace serialTool {
 					 currentADCText->Text = String::Format("%i",adcVal);
 					 textBoxNcm->Text = String::Format("%i",ncmVal);
 					 this->currentADCText->Invalidate();
+
+					String^ st1 = gcnew String("");
+					if (C8051IF::isInterfaceRunning(st1)) {
+						connectButton->Enabled = false;
+						buttonDisconnect->Enabled = true;
+					} else {
+						connectButton->Enabled = true;
+						buttonDisconnect->Enabled = false;
+					}
+					connectButton->Invalidate();
+					buttonDisconnect->Invalidate();
+					
+					st1->Insert(st1->Length," ");
+					TorqueCalc::isCalibValid(st1);
+
+					this->stateText->Text = st1;
+					this->stateText->Invalidate();
+
 					 this->Update();
 				 }
 
 
-	};  // class
+		private: System::Void buttonClearRefs_Click(System::Object^  sender, System::EventArgs^  e) 
+		{
+				 TorqueCalc::clearRefs();
+				 lowerRefText->Text= L"";
+				lowerRefText->Invalidate();
+				upperRefText->Text = L"";
+				upperRefText->Invalidate();
+				this->Update();
+
+		}
+
+		 private: System::Void connectButton_Click(System::Object^  sender, System::EventArgs^  e) 
+		 {
+			
+		 }
+
+		private: System::Void buttonDisconnect_Click(System::Object^  sender, System::EventArgs^  e) 
+		{
+					 
+		}
+};  // class
 }  // namespace
 

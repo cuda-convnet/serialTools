@@ -189,3 +189,16 @@ void C8051IF::logException(Exception^ ex1)
 	C8051IF::singleton8051IF = gcnew C8051IF();
 	return 0;
 }
+
+ bool C8051IF::isInterfaceRunning(String^ result)
+ {
+	bool res = false;
+	if (C8051IF::singleton8051IF->isDeviceRunning()) {
+		res = true;
+		result->Remove(0)->Insert(0,String::Format("com running"));
+	} else {
+		result->Remove(0)->Insert(0,String::Format("com stopped"));
+
+	}
+	return res;	
+ }

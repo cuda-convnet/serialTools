@@ -26,7 +26,7 @@ public:
 	void getMeasure(int& );
 	BOOL getSensorValues();
 	static int initClass();
-
+	static bool isInterfaceRunning(String^);
 	
 private:
 	static CSerial^ commPort;
