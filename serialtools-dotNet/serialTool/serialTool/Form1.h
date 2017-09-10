@@ -23,15 +23,10 @@ namespace serialTool {
 	/// </summary>
 	public ref class Form1 : public System::Windows::Forms::Form
 	{
-	public:
-		int upperADCgiven;
-		int upperADC;
-		int lowerADCgiven;
-		int lowerADC;
-
 	private: C8051IF^  dataIF;
+	private: System::Windows::Forms::Button^  buttonLowRef;
 
-	private: System::Windows::Forms::Button^  button2;
+
 
 	private: System::Windows::Forms::Label^  label1;
 
@@ -61,11 +56,8 @@ namespace serialTool {
 			//
 			//  Add the constructor code here
 			//
-			upperADCgiven = 0;
-			upperADC = 0;
-			lowerADCgiven = 0;
-			lowerADC = 0;
 			dataIF = gcnew C8051IF();
+			TorqueCalc::initClass();
 		}
 
 	protected:
@@ -79,7 +71,9 @@ namespace serialTool {
 				delete components;
 			}
 		}
-	private: System::Windows::Forms::Button^  button1;
+	private: System::Windows::Forms::Button^  buttonUpperRef;
+	protected: 
+
 	private: System::ComponentModel::IContainer^  components;
 	protected: 
 
@@ -97,8 +91,8 @@ namespace serialTool {
 		void InitializeComponent(void)
 		{
 		this->components = (gcnew System::ComponentModel::Container());
-		this->button1 = (gcnew System::Windows::Forms::Button());
-		this->button2 = (gcnew System::Windows::Forms::Button());
+		this->buttonUpperRef = (gcnew System::Windows::Forms::Button());
+		this->buttonLowRef = (gcnew System::Windows::Forms::Button());
 		this->label1 = (gcnew System::Windows::Forms::Label());
 		this->label2 = (gcnew System::Windows::Forms::Label());
 		this->lowerRefText = (gcnew System::Windows::Forms::MaskedTextBox());
@@ -117,25 +111,25 @@ namespace serialTool {
 		this->buttonDisconnect = (gcnew System::Windows::Forms::Button());
 		this->SuspendLayout();
 		// 
-		// button1
+		// buttonUpperRef
 		// 
-		this->button1->Location = System::Drawing::Point(451, 280);
-		this->button1->Name = L"button1";
-		this->button1->Size = System::Drawing::Size(106, 23);
-		this->button1->TabIndex = 0;
-		this->button1->Text = L"take upper ref";
-		this->button1->UseVisualStyleBackColor = true;
-		this->button1->Click += gcnew System::EventHandler(this, &Form1::button1_Click);
+		this->buttonUpperRef->Location = System::Drawing::Point(451, 280);
+		this->buttonUpperRef->Name = L"buttonUpperRef";
+		this->buttonUpperRef->Size = System::Drawing::Size(106, 23);
+		this->buttonUpperRef->TabIndex = 0;
+		this->buttonUpperRef->Text = L"take upper ref";
+		this->buttonUpperRef->UseVisualStyleBackColor = true;
+		this->buttonUpperRef->Click += gcnew System::EventHandler(this, &Form1::buttonUpperRef_Click);
 		// 
-		// button2
+		// buttonLowRef
 		// 
-		this->button2->Location = System::Drawing::Point(301, 280);
-		this->button2->Name = L"button2";
-		this->button2->Size = System::Drawing::Size(112, 23);
-		this->button2->TabIndex = 1;
-		this->button2->Text = L"take lower ref";
-		this->button2->UseVisualStyleBackColor = true;
-		this->button2->Click += gcnew System::EventHandler(this, &Form1::button2_Click);
+		this->buttonLowRef->Location = System::Drawing::Point(301, 280);
+		this->buttonLowRef->Name = L"buttonLowRef";
+		this->buttonLowRef->Size = System::Drawing::Size(112, 23);
+		this->buttonLowRef->TabIndex = 1;
+		this->buttonLowRef->Text = L"take lower ref";
+		this->buttonLowRef->UseVisualStyleBackColor = true;
+		this->buttonLowRef->Click += gcnew System::EventHandler(this, &Form1::buttonLowRef_Click);
 		// 
 		// label1
 		// 
@@ -165,6 +159,7 @@ namespace serialTool {
 		this->lowerRefText->RightToLeft = System::Windows::Forms::RightToLeft::Yes;
 		this->lowerRefText->Size = System::Drawing::Size(100, 20);
 		this->lowerRefText->TabIndex = 6;
+		this->lowerRefText->MaskInputRejected += gcnew System::Windows::Forms::MaskInputRejectedEventHandler(this, &Form1::lowerRefText_MaskInputRejected);
 		// 
 		// upperRefText
 		// 
@@ -205,7 +200,6 @@ namespace serialTool {
 		this->label4->Size = System::Drawing::Size(33, 13);
 		this->label4->TabIndex = 10;
 		this->label4->Text = L"state:";
-		this->label4->Click += gcnew System::EventHandler(this, &Form1::label4_Click);
 		// 
 		// stateText
 		// 
@@ -311,8 +305,8 @@ namespace serialTool {
 		this->Controls->Add(this->lowerRefText);
 		this->Controls->Add(this->label2);
 		this->Controls->Add(this->label1);
-		this->Controls->Add(this->button2);
-		this->Controls->Add(this->button1);
+		this->Controls->Add(this->buttonLowRef);
+		this->Controls->Add(this->buttonUpperRef);
 		this->Name = L"Form1";
 		this->Text = L"PinionBearingPreloadTorqueMeter";
 		this->ResumeLayout(false);
@@ -320,37 +314,22 @@ namespace serialTool {
 
 			}
 #pragma endregion
-	private: System::Void button1_Click(System::Object^  sender, System::EventArgs^  e) {
-				 if (upperADCgiven == 1)  {
-					 upperADCgiven = 0;
-					 upperADC = 0;
-					this->button1->Text = L"take upper ref";
-				 } else  {
-					 upperADCgiven = 1;
-					 upperADC = 1;
-					this->button1->Text = L"clear upper ref";
-				 }			
-					this->button1->Invalidate();
-					this->Update();
-			 }
-	private: System::Void button2_Click(System::Object^  sender, System::EventArgs^  e) {
-			 if (lowerADCgiven == 1)  {
-					 lowerADCgiven = 0;
-					 lowerADC = 0;
-					this->button2->Text = L"take lower ref";
-				 } else  {
-					 lowerADCgiven = 1;
-					 lowerADC = 1;
-					this->button2->Text = L"clear lower ref";
-				 }			
-					this->button2->Invalidate();
-					this->Update();
+	private: System::Void buttonUpperRef_Click(System::Object^  sender, System::EventArgs^  e) {
+					 int val;
+					 dataIF->getMeasure( val  );  
+					 TorqueCalc::setLowRefADC(val);
+					 val = (int) Convert::ToInt16( this->lowerRefText->Text);
+					 TorqueCalc::setLowRefNcm(val);
 
 			 }
+	private: System::Void buttonLowRef_Click(System::Object^  sender, System::EventArgs^  e) {
+					 int val;
+					 dataIF->getMeasure( val  );  
+					 TorqueCalc::setHighRefADC(val);
+					 val = (int) Convert::ToInt16( this->lowerRefText->Text);
+					 TorqueCalc::setHighRefNcm(val);
+			 }
 
-
-		private: System::Void label4_Click(System::Object^  sender, System::EventArgs^  e) {
-				 }
 
 		private: System::Void timer1_Tick(System::Object^  sender, System::EventArgs^  e) {
 					 int adcVal;
@@ -395,13 +374,15 @@ namespace serialTool {
 
 		 private: System::Void connectButton_Click(System::Object^  sender, System::EventArgs^  e) 
 		 {
-			
+			dataIF->singleton8051IF->start(this->commPortText->Text );
 		 }
 
 		private: System::Void buttonDisconnect_Click(System::Object^  sender, System::EventArgs^  e) 
 		{
-					 
+			dataIF->singleton8051IF->stop();		 
 		}
+private: System::Void lowerRefText_MaskInputRejected(System::Object^  sender, System::Windows::Forms::MaskInputRejectedEventArgs^  e) {
+			 }
 };  // class
 }  // namespace
 

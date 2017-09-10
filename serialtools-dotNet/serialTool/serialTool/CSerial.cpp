@@ -3,6 +3,7 @@
 
 
 CSerial::CSerial(){
+	_serialPort = gcnew SerialPort();
 };
 
 
@@ -36,11 +37,11 @@ BOOL CSerial::Configure_port(System::String ^  commPort)
 	 _serialPort = gcnew SerialPort();
 
 	// Allow the user to set the appropriate properties.
-	_serialPort->PortName = "COM1";
+	_serialPort->PortName = commPort;
 	_serialPort-> BaudRate = 9600;
 	_serialPort->Parity =  Parity::None;
 	_serialPort->DataBits =  8;
-	_serialPort->StopBits =  StopBits::None  ;
+	_serialPort->StopBits =  StopBits::One  ;  
 	_serialPort->Handshake =  Handshake::None;
 
 	// Set the read/write timeouts

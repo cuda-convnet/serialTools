@@ -27,6 +27,7 @@ public:
 	BOOL getSensorValues();
 	static int initClass();
 	static bool isInterfaceRunning(String^);
+	static C8051IF^ singleton8051IF;
 	
 private:
 	static CSerial^ commPort;
@@ -44,6 +45,6 @@ private:
 	static void logException(Exception^ ex1);
 	
 	static void hygroThreadMethod(); 
-	static C8051IF^ singleton8051IF;
+	
 	static String^ comPortName;
 };

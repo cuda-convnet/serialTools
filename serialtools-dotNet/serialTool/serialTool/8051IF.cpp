@@ -25,6 +25,8 @@ C8051IF::C8051IF()
 		hygroMutex =   gcnew Semaphore( 1,1 );
 		deviceRunning = false;
 		threadRunning = false;
+		singleton8051IF = this;
+		commPort = gcnew CSerial();
 	}
 	catch (Exception^ ex)  {
 			logException(ex);
@@ -33,7 +35,11 @@ C8051IF::C8051IF()
 
 C8051IF::~C8051IF()
 {
-//	TRACE0("\ndestructor C8051IF\n");
+	Debug::WriteLine("\ndestructor C8051IF\n");
+	if (threadRunning == true) {
+		Debug::WriteLine("C8051IF::~C8051IF needs to stop  thread");
+		stop();
+	}
 }
 
 
@@ -50,11 +56,11 @@ int C8051IF::start(String^ comName)
 
 		hygroThread = gcnew Thread(gcnew ThreadStart(C8051IF::hygroThreadMethod));
 		hygroThread->Start();
+		threadRunning = true;
 	}
 	catch (Exception^ ex)  {
 			logException(ex);
 	}
-	threadRunning = true;
 	return 1;
 }
 
@@ -62,16 +68,20 @@ void C8051IF::stop()
 {
 	DWORD tmOut;
 
-	commPort->Close_port();
+	try {
+			commPort->Close_port();
 
-	hygroStopEvent->Release();
+			hygroStopEvent->Release();
 
-	tmOut = GBSerialReadTotalTimeoutConstant  \
-			+ GBReadIntervalTimeout  \
-			+ 2000;  //  max calculation time
+			tmOut = GBSerialReadTotalTimeoutConstant  \
+					+ GBReadIntervalTimeout  \
+					+ 2000;  //  max calculation time
 
-	hygroThread->Join(tmOut);
-	threadRunning = false;
+			hygroThread->Join(tmOut);
+			threadRunning = false;
+		} catch  (Exception^ ex)  {
+			logException(ex);
+		}
 }
 
 

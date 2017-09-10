@@ -45,12 +45,12 @@ private:
 // HANDLE hComm;
 // DCB      m_dcb;
 // COMMTIMEOUTS m_CommTimeouts;
- BOOL     m_bPortReady;
- BOOL     bWriteRC;
- BOOL     bReadRC;
- DWORD iBytesWritten;
- DWORD iBytesRead;
- DWORD dwBytesRead;
+// BOOL     m_bPortReady;
+// BOOL     bWriteRC;
+// BOOL     bReadRC;
+// DWORD iBytesWritten;
+// DWORD iBytesRead;
+// DWORD dwBytesRead;
 
  BOOL Configure_port(System::String ^  commPort);
  void logException(Exception^ ex1);
