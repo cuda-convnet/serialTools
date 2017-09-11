@@ -17,7 +17,7 @@ public:
 	static void setLowRefNcm(int ncm);
 	static void setHighRefNcm(int ncm);
 	static void clearRefs();
-	static bool isCalibValid(String^);
+	static bool isCalibValid(String^*);
 	static void resultTorqueNcm(int&, int&);
 
 	static void initClass();

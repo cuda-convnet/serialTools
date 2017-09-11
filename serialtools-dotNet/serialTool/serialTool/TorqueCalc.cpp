@@ -58,8 +58,8 @@
 
 	void TorqueCalc::resultTorqueNcmInner(int& adc,int& Ncm)
 	{
-		calcMutex->WaitOne();
-		if (isCalibValid(String::Format(""))) {
+		String^ st1 = String::Format(""); 
+		if (isCalibValid(&st1) && C8051IF::isInterfaceRunning(&st1)) {
 			
 			float dADC = (float) (highRefADC - lowRefADC);
 			float dNcm = (float) (highRefNcm - lowRefNcm);
@@ -86,7 +86,7 @@
 		calcMutex->Release();
 	}
 
-	bool TorqueCalc::isCalibValid(String^ resS)
+	bool TorqueCalc::isCalibValid(String^* resS)
 	{	
 		bool res = false;
 		if ((lowRefADC > 0) && (highRefADC > 0) && (lowRefNcm > 0) && (highRefNcm > 0)) {
@@ -94,13 +94,13 @@
 				if (lowRefADC < highRefADC) {
 					res = true;
 				} else {
-					resS->Insert(resS->Length,String::Format("lowRefADC >= highRefADC"));
+					*resS += String::Format("lowRefADC >= highRefADC");
 				}
 			} else {
-				resS->Insert(resS->Length,String::Format("lowRefNcm >= highRefNcm"));
+				*resS += String::Format("lowRefNcm >= highRefNcm");
 			}
 		} else {
-			resS->Insert(resS->Length,String::Format("some refs are 0"));
+			*resS += String::Format("some refs are 0");
 		}
 		return res;
 	}

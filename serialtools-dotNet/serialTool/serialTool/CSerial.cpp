@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "CSerial.h"
+#include "Form1.h"
 
 
 CSerial::CSerial(){
@@ -12,7 +13,8 @@ CSerial::~CSerial(){
 
 void CSerial::logException(Exception^ ex1)
 {
-	Debug::WriteLine(String::Format("CSerial exception %s source: %s\nmessage : %s\nstack: %s",ex1->ToString(),ex1->Source,ex1->Message,ex1->StackTrace));
+serialTool::Form1::logException(ex1);
+//	Debug::WriteLine(String::Format("CSerial exception %s source: %s\nmessage : %s\nstack: %s",ex1->ToString(),ex1->Source,ex1->Message,ex1->StackTrace));
 }
 
 BOOL CSerial::Open_port(System::String ^  commPort)

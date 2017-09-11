@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "TorqueCalc.h"
+#include "Form1.h"
 
 //  PN 8. Nov 2005
 //
@@ -27,6 +28,8 @@ C8051IF::C8051IF()
 		threadRunning = false;
 		singleton8051IF = this;
 		commPort = gcnew CSerial();
+		measureCount = 0;
+		torqueADCval = 0;
 	}
 	catch (Exception^ ex)  {
 			logException(ex);
@@ -50,7 +53,7 @@ int C8051IF::start(String^ comName)
 		stop();
 	}
 	try {
-		Debug::WriteLine(String::Format("\nstart C8051IF port: %s",comName));
+		Debug::WriteLine(String::Format("\nstart C8051IF port: {0}",comName));
 		comPortName = comName;
 		commPort->Open_port(comPortName); 
 
@@ -94,7 +97,7 @@ void C8051IF::hygroThreadMethod()
 
 	while (! hygroStopEvent->WaitOne(100) )  {
 		++ step;
-		Debug::WriteLine(String::Format("HYGROTHREAD::hygro Thrad step %i",step));
+		Debug::WriteLine(String::Format("HYGROTHREAD::hygro Thrad step {0}",step));
 
 		if (! C8051IF::singleton8051IF->getSensorValues()) {
 			Debug::WriteLine("HYGROTHREAD::hygro Thread error getting values");
@@ -161,7 +164,7 @@ BOOL C8051IF::getSensorValues()
 		res = true;
 
 	} else {
-		Debug::WriteLine(String::Format("getSensorValues invalid amt chars: %i",amtRcv));
+		Debug::WriteLine(String::Format("getSensorValues invalid amt chars: {0}",amtRcv));
 		setDeviceRunning(false);
 	}
 
@@ -190,7 +193,8 @@ void C8051IF::setDeviceRunning(BOOL runOK)
 
 void C8051IF::logException(Exception^ ex1)
 {
-	Debug::WriteLine(String::Format("C8051IF exception %s source: %s\nmessage : %s\nstack: %s",ex1->ToString(),ex1->Source,ex1->Message,ex1->StackTrace));
+	serialTool::Form1::logException(ex1);
+//Debug::WriteLine(String::Format("C8051IF exception {0} source: {1}\nmessage : {2}\nstack: {3}",ex1->ToString(),ex1->Source,ex1->Message,ex1->StackTrace));
 }
 
  int C8051IF::initClass()
@@ -200,14 +204,14 @@ void C8051IF::logException(Exception^ ex1)
 	return 0;
 }
 
- bool C8051IF::isInterfaceRunning(String^ result)
+ bool C8051IF::isInterfaceRunning(String^* result)
  {
 	bool res = false;
 	if (C8051IF::singleton8051IF->isDeviceRunning()) {
 		res = true;
-		result->Remove(0)->Insert(0,String::Format("com running"));
+		*result += String::Format("com running");
 	} else {
-		result->Remove(0)->Insert(0,String::Format("com stopped"));
+		*result += String::Format("com stopped");
 
 	}
 	return res;	

@@ -181,6 +181,7 @@ namespace serialTool {
 		this->currentADCText->Size = System::Drawing::Size(132, 68);
 		this->currentADCText->TabIndex = 8;
 		this->currentADCText->Text = L"123";
+		this->currentADCText->TextAlign = System::Windows::Forms::HorizontalAlignment::Right;
 		// 
 		// label3
 		// 
@@ -309,6 +310,7 @@ namespace serialTool {
 		this->Controls->Add(this->buttonUpperRef);
 		this->Name = L"Form1";
 		this->Text = L"PinionBearingPreloadTorqueMeter";
+		this->Load += gcnew System::EventHandler(this, &Form1::Form1_Load);
 		this->ResumeLayout(false);
 		this->PerformLayout();
 
@@ -318,7 +320,11 @@ namespace serialTool {
 					 int val;
 					 dataIF->getMeasure( val  );  
 					 TorqueCalc::setLowRefADC(val);
-					 val = (int) Convert::ToInt16( this->lowerRefText->Text);
+					 try {
+						val = (int) Convert::ToInt16( this->lowerRefText->Text);
+					 }catch (Exception^ ex1) {
+							val = 0;
+					 }
 					 TorqueCalc::setLowRefNcm(val);
 
 			 }
@@ -326,7 +332,11 @@ namespace serialTool {
 					 int val;
 					 dataIF->getMeasure( val  );  
 					 TorqueCalc::setHighRefADC(val);
-					 val = (int) Convert::ToInt16( this->lowerRefText->Text);
+					 try {
+						val = (int) Convert::ToInt16( this->lowerRefText->Text);
+					 }catch (Exception^ ex1) {
+							val = 0;
+					 }
 					 TorqueCalc::setHighRefNcm(val);
 			 }
 
@@ -336,12 +346,12 @@ namespace serialTool {
 					 int ncmVal;
 					 TorqueCalc::resultTorqueNcm( adcVal,ncmVal) ; 
 					 // TODO add calculator and call from here
-					 currentADCText->Text = String::Format("%i",adcVal);
-					 textBoxNcm->Text = String::Format("%i",ncmVal);
+					 currentADCText->Text = String::Format("{0}",adcVal);
+					 textBoxNcm->Text = String::Format("{0}",ncmVal);
 					 this->currentADCText->Invalidate();
 
 					String^ st1 = gcnew String("");
-					if (C8051IF::isInterfaceRunning(st1)) {
+					if (C8051IF::isInterfaceRunning(&st1)) {
 						connectButton->Enabled = false;
 						buttonDisconnect->Enabled = true;
 					} else {
@@ -351,8 +361,8 @@ namespace serialTool {
 					connectButton->Invalidate();
 					buttonDisconnect->Invalidate();
 					
-					st1->Insert(st1->Length," ");
-					TorqueCalc::isCalibValid(st1);
+					st1 += " / calc ";
+					TorqueCalc::isCalibValid(&st1);
 
 					this->stateText->Text = st1;
 					this->stateText->Invalidate();
@@ -383,6 +393,18 @@ namespace serialTool {
 		}
 private: System::Void lowerRefText_MaskInputRejected(System::Object^  sender, System::Windows::Forms::MaskInputRejectedEventArgs^  e) {
 			 }
+private: System::Void Form1_Load(System::Object^  sender, System::EventArgs^  e) {
+			 this->timer1->Start();
+			 }
+
+public:
+	static void logException(Exception^ ex1)
+	{
+		Debug::WriteLine(String::Format("C8051IF exception {0} source: {1}\nmessage : {2}\nstack: {3}",
+											ex1->ToString(),ex1->Source,ex1->Message,ex1->StackTrace));
+	}
+
+
 };  // class
 }  // namespace
 

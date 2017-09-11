@@ -1,3 +1,5 @@
+#pragma once
+
 #include "stdafx.h"
 //#include <commctrl.h>
 #include "CSerial.h"
@@ -26,7 +28,7 @@ public:
 	void getMeasure(int& );
 	BOOL getSensorValues();
 	static int initClass();
-	static bool isInterfaceRunning(String^);
+	static bool isInterfaceRunning(String^*);
 	static C8051IF^ singleton8051IF;
 	
 private:
