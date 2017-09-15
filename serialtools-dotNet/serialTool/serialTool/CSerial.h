@@ -39,7 +39,7 @@ static SerialPort^ _serialPort;
 
  BOOL Open_port(System::String ^  commPort);
 // BOOL Write_port(void);
- BOOL Read_port( array<Byte>^  , int, int* );
+ BOOL Read_port( array<Byte>^*  , int, int* );
  BOOL Close_port(void);
 
 private:

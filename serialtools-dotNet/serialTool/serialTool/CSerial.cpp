@@ -87,11 +87,21 @@ BOOL CSerial::Write_port(void)
 
 //***************************************************
 
-BOOL CSerial::Read_port( array<Byte>^ buffer,   int count, int* amt)
+BOOL CSerial::Read_port( array<Byte>^* buffer,   int count, int* amt)
 {
 	BOOL res = 0;
+	String ^ resS;
+	*amt = 0;
 	try {
-		*amt = _serialPort->Read(buffer,0,count);
+//		*amt = _serialPort->Read(buffer,0,count);
+		_serialPort->DiscardInBuffer();
+		resS = _serialPort->ReadTo("|||");
+		array<Char>^charAr = resS->ToCharArray();
+		*amt = resS->Length;
+		Array::Resize(*buffer,resS->Length);
+		for (int i1 = 0; i1 < resS->Length; ++ i1) {
+			(*buffer)->SetValue( (Byte)(charAr[i1]) ,i1);
+		}
 		res = 1;
 	} catch ( Exception^ ex1) {
 		logException(ex1);

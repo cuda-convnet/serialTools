@@ -92,15 +92,28 @@ void C8051IF::stop()
 void C8051IF::hygroThreadMethod()
 {
 	int step = 0;
+	int stopReceived = false;
 	
 	Debug::WriteLine("HYGROTHREAD::hygro Thread Started");
 
-	while (! hygroStopEvent->WaitOne(100) )  {
+	while (! stopReceived )  {
 		++ step;
-		Debug::WriteLine(String::Format("HYGROTHREAD::hygro Thrad step {0}",step));
-
-		if (! C8051IF::singleton8051IF->getSensorValues()) {
-			Debug::WriteLine("HYGROTHREAD::hygro Thread error getting values");
+		try {
+			stopReceived = hygroStopEvent->WaitOne(100);
+		} catch (Exception^ ex1) { 
+			stopReceived = false;
+			logException(ex1);
+		}
+		if (!stopReceived) {
+			Debug::WriteLine(String::Format("HYGROTHREAD::hygro Thrad step {0}",step));
+			
+			try {
+				if (! C8051IF::singleton8051IF->getSensorValues()) {
+					Debug::WriteLine("HYGROTHREAD::hygro Thread error getting values");
+				}
+			} catch (Exception^ ex2) {
+				logException (ex2);
+			}
 		}
 	}
 	Debug::WriteLine("HYGROTHREAD::hygro Thrad Returning");
@@ -141,7 +154,7 @@ BOOL C8051IF::getSensorValues()
 	array<Byte>^ bufferx;
 	bufferx = gcnew array<Byte>(bufferSz);
 
-	commPort->Read_port(bufferx,bufferSz,&amtRcv);
+	commPort->Read_port(&bufferx,bufferSz,&amtRcv);
 
 	if (amtRcv == applicationMsgSize ) {
 

@@ -14,7 +14,7 @@ typedef int HANDLE;
 //typedef int DWORD;
 
 #define WINAPI
-#define applicationMsgSize   17
+#define applicationMsgSize   0x0d
 
 public ref class C8051IF {
 public:
