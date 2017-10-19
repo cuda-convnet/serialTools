@@ -233,13 +233,14 @@
 			&& (refsValid(highMinusRefNcm,lowMinusRefNcm,lowMinusRefADC,highMinusRefADC,"minus: ",resS ));
 				// lowMinusADC must be higher than highMinusRefADC
 		if (res)  {
-			if (lowMinusRefNcm < lowRefNcm) {
+			if  (true){ // (lowMinusRefNcm < lowRefNcm) {
 				if (lowMinusRefADC < lowRefADC) {
 					if ((midPointADC < lowRefADC) && (lowMinusRefADC < midPointADC)) {
 					} else {  
 						res= false;
 						*resS= String::Format("midPointADC must be between lowMinusRefADC and lowRefADC");
 					}
+
 				} else {
 					res= false;
 					*resS = String::Format("lowMinusRefADC must be smaller than lowRefADC");
