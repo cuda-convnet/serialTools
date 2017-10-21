@@ -59,10 +59,15 @@
 		delete twaArray[0];
 		twaArray [0] = new AdcTwaRec(topVal);
 		float sumAdc = 0.0;
+
+		Debug::WriteLine(String::Format("start printout of {0} lines",amtTwaRecs));
 		for (int i1 = 0; i1 < amtTwaRecs; ++ i1) {
+			Debug::WriteLine(String::Format("{0,3} val {1,9:N3}",i1,twaArray[i1]->twaAdcVal));			
 			sumAdc += twaArray[i1]->twaAdcVal;
 		}
-		curAdcTwaVal = sumAdc / ((float) totalTwaWeights);
+		Debug::WriteLine(String::Format("end printout"));
+		float totWeights = (float) totalTwaWeights;
+		curAdcTwaVal = (sumAdc * amtTwaRecs) / totWeights;
 		++amtValuesAdded;
 	}
 
@@ -176,7 +181,7 @@
 		float lAdc = (float) lowADC;
 		float xAdc = (float) adcV;
 
-		float resF = lNcm + (dNcm/dADC) * (xAdc - lAdc);
+		float resF = lNcm + dNcm * ((xAdc - lAdc) / dADC);
 		resNcm = (int) resF;
 	}
 
@@ -187,7 +192,7 @@
 		if (isCalibValid(&st1) && C8051IF::isInterfaceRunning(&st1)) {
 			if (adcVal >= midPointADC) {
 				calcLinear(adcVal,lowRefNcm,highRefNcm,lowRefADC,highRefADC,Ncm);
-			adc = adcVal;
+				
 			} else {
 				calcLinear(adcVal,lowMinusRefNcm,highMinusRefNcm,lowMinusRefADC,highMinusRefADC,Ncm);
 			}

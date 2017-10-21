@@ -457,6 +457,11 @@ namespace serialTool {
 							val = 0;
 					 }
 					 TorqueCalc::setLowRefNcm(val);
+					 int v1 = 9;
+					 //Debug::WriteLine("\nhello ");
+					 //Debug::WriteLine(String::Format("hello world "));
+					 //Debug::WriteLine(String::Format("{0} val ",v1));
+					 Debug::WriteLine(String::Format("{0} val {1,9:N3}",8,123.456789));
 			 }
 
 
